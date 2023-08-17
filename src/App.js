@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Switch, Link, Redirect, useParams } from "react-router-dom";
+import { Route, Link, Navigate, useParams, Routes } from "react-router-dom";
 
 const users = [{ id: 0 }, { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
 
@@ -31,7 +31,7 @@ function App() {
         <ul>
           {users.map((user) => (
             <li key={user.id}>
-              <Link to={`/users/${user.id}`}>{`User ${user.id}`}</Link>
+              <Link to={`${user.id}`}>{`User ${user.id}`}</Link>
             </li>
           ))}
         </ul>
@@ -41,18 +41,15 @@ function App() {
 
   function UserProfile() {
     const { userId } = useParams();
-    const pathToProfile = `/users/${userId}/profile`;
-    const pathToEdit = `/users/${userId}/edit`;
 
     return (
       <div>
-        <Redirect to={pathToProfile} />
-        <Route
-          path={pathToProfile}
-          render={() => <UserInfo userId={userId} />}
-        />
-        <Route path={pathToEdit} render={() => <Edit userId={userId} />} />
-        <Redirect to={pathToProfile} />
+        <Routes>
+          <Route path={`${userId}/`} element={<Navigate to="profile" />} />
+          <Route path="profile" element={<UserInfo userId={userId} />} />
+          <Route path="edit" element={<Edit userId={userId} />} />
+          <Route path="*" element={<Navigate to="profile" />} />
+        </Routes>
       </div>
     );
   }
@@ -96,12 +93,12 @@ function App() {
   return (
     <div>
       <h1>App Layout</h1>
-      <Link to="/users">Users list Page</Link>
-      <Switch>
-        <Route path="/" exact component={Home} />
-        <Route path="/users/:userId?" component={Users} />
-        <Redirect to="/" />
-      </Switch>
+      <Link to="users">Users list Page</Link>
+      <Routes>
+        <Route index element={<Home />} />
+        <Route path="users/:userId?/*" element={<Users />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
     </div>
   );
 }
